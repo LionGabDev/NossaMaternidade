@@ -71,7 +71,7 @@ struct MirrorView: View {
                             .foregroundStyle(.white)
                             .padding(.horizontal, 32)
                             .padding(.vertical, 12)
-                            .background(Color(hex: "#D9876E"))
+                            .background(Color(hex: "#E8A598"))
                             .clipShape(.rect(cornerRadius: 24))
                     }
                     .transition(.opacity.combined(with: .move(edge: .bottom)))

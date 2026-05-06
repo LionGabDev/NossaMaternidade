@@ -52,7 +52,7 @@ struct LetterToBabyView: View {
                     // Círculo de progresso
                     Circle()
                         .trim(from: 0, to: progress)
-                        .stroke(Color(hex: "#D9876E"), lineWidth: 4)
+                        .stroke(Color(hex: "#E8A598"), lineWidth: 4)
                         .rotationEffect(.degrees(-90))
                         .frame(width: 120, height: 120)
 
@@ -66,12 +66,12 @@ struct LetterToBabyView: View {
                     } label: {
                         ZStack {
                             Circle()
-                                .fill(isRecording ? Color.white : Color(hex: "#D9876E"))
+                                .fill(isRecording ? Color.white : Color(hex: "#E8A598"))
                                 .frame(width: 100, height: 100)
 
                             Image(systemName: isRecording ? "stop.fill" : "mic.fill")
                                 .font(.system(size: 36, weight: .medium))
-                                .foregroundStyle(isRecording ? Color(hex: "#D9876E") : .white)
+                                .foregroundStyle(isRecording ? Color(hex: "#E8A598") : .white)
                         }
                     }
                     .disabled(isRecording && progress < 1.0)

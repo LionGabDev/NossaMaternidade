@@ -33,7 +33,7 @@ struct EmotionalChoiceView: View {
         EmotionalChoice(
             text: "Preciso de alguém",
             subtitle: "que entenda",
-            color: Color(hex: "#D9876E"),
+            color: Color(hex: "#E8A598"),
             icon: "heart.fill"
         ),
         EmotionalChoice(
@@ -138,6 +138,9 @@ struct EmotionalChoiceView: View {
                 }
 
                 Spacer()
+
+                OnboardingProgressDots(total: 5, current: 1)
+                    .padding(.bottom, 32)
             }
         }
         .onAppear {

@@ -8,27 +8,38 @@ import SwiftData
 import Charts
 import PhotosUI
 
+enum DiaryMetric: String, CaseIterable, Identifiable {
+    case peso = "Peso"
+    case humor = "Humor"
+    case sono = "Sono"
+    case nausea = "Náusea"
+
+    var id: String { rawValue }
+
+    var unit: String {
+        switch self {
+        case .peso: return "kg"
+        case .humor: return ""
+        case .sono: return "h"
+        case .nausea: return ""
+        }
+    }
+}
+
 struct DiaryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \SymptomEntry.date, order: .reverse) private var entries: [SymptomEntry]
     @State private var selectedDate = Date()
     @State private var showAddSheet = false
-    @State private var showCalendar = false
+    @State private var selectedMetric: DiaryMetric = .peso
 
     var filteredEntries: [SymptomEntry] {
-        let calendar = Calendar.current
-        return entries.filter { calendar.isDate($0.date, inSameDayAs: selectedDate) }
+        entries.filter { Calendar.current.isDate($0.date, inSameDayAs: selectedDate) }
     }
 
     var last7DaysEntries: [SymptomEntry] {
         let calendar = Calendar.current
         let start = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: Date())) ?? Date()
-        return entries.filter { $0.date >= start }.sorted { $0.date < $1.date }
-    }
-
-    var last30DaysEntries: [SymptomEntry] {
-        let calendar = Calendar.current
-        let start = calendar.date(byAdding: .day, value: -29, to: calendar.startOfDay(for: Date())) ?? Date()
         return entries.filter { $0.date >= start }.sorted { $0.date < $1.date }
     }
 
@@ -45,12 +56,7 @@ struct DiaryView: View {
                     }
 
                     if !last7DaysEntries.isEmpty {
-                        chartSection(title: "Últimos 7 dias - Peso (kg)", data: last7DaysEntries, keyPath: \.weightKg)
-                        chartSection(title: "Últimos 7 dias - Sono (horas)", data: last7DaysEntries, keyPath: \.sleepHours)
-                    }
-
-                    if !last30DaysEntries.isEmpty {
-                        chartSection(title: "Últimos 30 dias - Peso (kg)", data: last30DaysEntries, keyPath: \.weightKg)
+                        chartCard
                     }
                 }
                 .padding(.horizontal, AppSpacing.md)
@@ -70,10 +76,12 @@ struct DiaryView: View {
                 }
             }
             .sheet(isPresented: $showAddSheet) {
-                AddSymptomSheet(date: selectedDate)
+                AddSymptomSheet(date: selectedDate, existing: filteredEntries.first)
             }
         }
     }
+
+    // MARK: - Date selector
 
     private var dateSelector: some View {
         HStack {
@@ -90,9 +98,11 @@ struct DiaryView: View {
             VStack(spacing: 2) {
                 Text(dateFormatter.string(from: selectedDate))
                     .font(AppFont.title3)
+                    .foregroundStyle(AppColor.charcoal)
                 Text(isToday ? "Hoje" : "")
                     .font(AppFont.caption)
                     .foregroundStyle(AppColor.sageGreen)
+                    .frame(height: 14)
             }
 
             Spacer()
@@ -110,15 +120,16 @@ struct DiaryView: View {
         .clipShape(.rect(cornerRadius: 16))
     }
 
-    private var isToday: Bool {
-        Calendar.current.isDateInToday(selectedDate)
-    }
+    private var isToday: Bool { Calendar.current.isDateInToday(selectedDate) }
+
+    // MARK: - Today entry
 
     private func todayEntryCard(entry: SymptomEntry) -> some View {
         VStack(alignment: .leading, spacing: AppSpacing.md) {
             HStack {
                 Text("Registro do dia")
                     .font(AppFont.title3)
+                    .foregroundStyle(AppColor.charcoal)
                 Spacer()
                 Button {
                     showAddSheet = true
@@ -139,6 +150,21 @@ struct DiaryView: View {
                 Spacer()
             }
 
+            if !entry.notes.isEmpty {
+                VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                    Text("Notas")
+                        .font(AppFont.captionMedium)
+                        .foregroundStyle(AppColor.textSecondary)
+                    Text(entry.notes)
+                        .font(AppFont.body)
+                        .foregroundStyle(AppColor.charcoal)
+                        .padding(AppSpacing.sm)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppColor.sand.opacity(0.6))
+                        .clipShape(.rect(cornerRadius: 10))
+                }
+            }
+
             if let photoURL = entry.photoURL, let url = URL(string: photoURL) {
                 AsyncImage(url: url) { image in
                     image.resizable().aspectRatio(contentMode: .fill)
@@ -152,6 +178,8 @@ struct DiaryView: View {
         .roundedCard()
     }
 
+    // MARK: - Empty state
+
     private var noEntryCard: some View {
         VStack(spacing: AppSpacing.md) {
             Image(systemName: "book.closed")
@@ -159,6 +187,9 @@ struct DiaryView: View {
                 .foregroundStyle(AppColor.sageLight)
             Text("Nenhum registro para este dia")
                 .font(AppFont.body)
+                .foregroundStyle(AppColor.textSecondary)
+            Text("Como você se sente hoje?")
+                .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
             Button {
                 showAddSheet = true
@@ -178,13 +209,12 @@ struct DiaryView: View {
     }
 
     private func moodView(mood: Int) -> some View {
-        let emojis = ["😢", "😕", "😐", "🙂", "😊"]
-        let labels = ["Muito mal", "Mal", "Neutro", "Bem", "Muito bem"]
-        let index = max(0, min(mood - 1, 4))
+        let emoji = moodEmoji(for: mood)
+        let label = moodLabel(for: mood)
         return VStack(spacing: AppSpacing.xs) {
-            Text(emojis[index])
+            Text(emoji)
                 .font(.system(size: 32))
-            Text(labels[index])
+            Text(label)
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
         }
@@ -197,6 +227,7 @@ struct DiaryView: View {
                 .foregroundStyle(color)
             Text(value)
                 .font(AppFont.bodyMedium)
+                .foregroundStyle(AppColor.charcoal)
             Text(label)
                 .font(AppFont.caption)
                 .foregroundStyle(AppColor.textSecondary)
@@ -204,35 +235,61 @@ struct DiaryView: View {
         .frame(minWidth: 70)
     }
 
-    private func chartSection(title: String, data: [SymptomEntry], keyPath: KeyPath<SymptomEntry, Double>) -> some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            Text(title)
-                .font(AppFont.title3)
+    // MARK: - Chart
 
-            Chart(data) { entry in
+    private var chartCard: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.md) {
+            Text("Últimos 7 dias")
+                .font(AppFont.title3)
+                .foregroundStyle(AppColor.charcoal)
+
+            Picker("Métrica", selection: $selectedMetric) {
+                ForEach(DiaryMetric.allCases) { metric in
+                    Text(metric.rawValue).tag(metric)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Chart(last7DaysEntries) { entry in
                 LineMark(
                     x: .value("Data", entry.date, unit: .day),
-                    y: .value("Valor", entry[keyPath: keyPath])
+                    y: .value("Valor", value(for: entry, metric: selectedMetric))
                 )
                 .foregroundStyle(AppColor.sageGreen)
                 .interpolationMethod(.catmullRom)
+                .symbol(.circle)
 
                 AreaMark(
                     x: .value("Data", entry.date, unit: .day),
-                    y: .value("Valor", entry[keyPath: keyPath])
+                    y: .value("Valor", value(for: entry, metric: selectedMetric))
                 )
-                .foregroundStyle(AppColor.sageGreen.opacity(0.1))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [AppColor.sageGreen.opacity(0.25), AppColor.sand.opacity(0)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                 .interpolationMethod(.catmullRom)
             }
             .frame(height: 180)
             .chartXAxis {
-                AxisMarks(values: .stride(by: .day)) { value in
+                AxisMarks(values: .stride(by: .day)) { _ in
                     AxisValueLabel(format: .dateTime.day())
                         .font(AppFont.caption)
                 }
             }
         }
         .roundedCard()
+    }
+
+    private func value(for entry: SymptomEntry, metric: DiaryMetric) -> Double {
+        switch metric {
+        case .peso: return entry.weightKg
+        case .humor: return Double(entry.mood)
+        case .sono: return entry.sleepHours
+        case .nausea: return Double(entry.nausea)
+        }
     }
 
     private var dateFormatter: DateFormatter {
@@ -243,10 +300,25 @@ struct DiaryView: View {
     }
 }
 
+// MARK: - Helpers (file-private)
+
+func moodEmoji(for value: Int) -> String {
+    let emojis = ["😭", "😔", "😐", "🙂", "😊"]
+    return emojis[max(0, min(value - 1, 4))]
+}
+
+func moodLabel(for value: Int) -> String {
+    let labels = ["Muito mal", "Mal", "Neutro", "Bem", "Muito bem"]
+    return labels[max(0, min(value - 1, 4))]
+}
+
+// MARK: - Add / Edit Sheet
+
 struct AddSymptomSheet: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     let date: Date
+    let existing: SymptomEntry?
 
     @State private var mood: Int = 3
     @State private var sleepHours: Double = 7.0
@@ -259,20 +331,31 @@ struct AddSymptomSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Humor") {
-                    HStack {
+                Section("Como você se sentiu hoje?") {
+                    HStack(spacing: 0) {
                         ForEach(1...5, id: \.self) { i in
                             Button {
                                 mood = i
+                                UISelectionFeedbackGenerator().selectionChanged()
                             } label: {
-                                Text(moodEmoji(for: i))
-                                    .font(.system(size: 32))
-                                    .opacity(mood == i ? 1.0 : 0.4)
+                                VStack(spacing: 4) {
+                                    Text(moodEmoji(for: i))
+                                        .font(.system(size: 32))
+                                        .opacity(mood == i ? 1.0 : 0.4)
+                                    if mood == i {
+                                        Circle()
+                                            .fill(AppColor.sageGreen)
+                                            .frame(width: 4, height: 4)
+                                    } else {
+                                        Color.clear.frame(width: 4, height: 4)
+                                    }
+                                }
                             }
+                            .buttonStyle(.plain)
                             .frame(maxWidth: .infinity)
                         }
                     }
-                    .listRowBackground(Color.clear)
+                    .padding(.vertical, 4)
                 }
 
                 Section("Sono (horas)") {
@@ -310,15 +393,14 @@ struct AddSymptomSheet: View {
                 }
 
                 Section("Notas") {
-                    TextEditor(text: $notes)
-                        .frame(minHeight: 80)
+                    TextField("Como você se sentiu hoje?", text: $notes, axis: .vertical)
+                        .lineLimit(3...8)
                 }
             }
-            .navigationTitle("Novo registro")
+            .navigationTitle(existing == nil ? "Novo registro" : "Editar registro")
             .navigationBarTitleDisplayMode(.inline)
-            .onChange(of: selectedPhotoItem) { _, _ in
-                loadPhoto()
-            }
+            .onAppear { loadExisting() }
+            .onChange(of: selectedPhotoItem) { _, _ in loadPhoto() }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancelar") { dismiss() }
@@ -331,8 +413,13 @@ struct AddSymptomSheet: View {
         }
     }
 
-    private func moodEmoji(for value: Int) -> String {
-        ["😢", "😕", "😐", "🙂", "😊"][max(0, min(value - 1, 4))]
+    private func loadExisting() {
+        guard let e = existing else { return }
+        mood = e.mood
+        sleepHours = e.sleepHours
+        nausea = e.nausea
+        weightKg = String(format: "%.1f", e.weightKg)
+        notes = e.notes
     }
 
     private func saveEntry() {
@@ -346,16 +433,25 @@ struct AddSymptomSheet: View {
             photoURL = url.absoluteString
         }
 
-        let entry = SymptomEntry(
-            date: date,
-            mood: mood,
-            sleepHours: sleepHours,
-            nausea: nausea,
-            weightKg: weight,
-            photoURL: photoURL,
-            notes: notes
-        )
-        modelContext.insert(entry)
+        if let e = existing {
+            e.mood = mood
+            e.sleepHours = sleepHours
+            e.nausea = nausea
+            e.weightKg = weight
+            e.notes = notes
+            if let p = photoURL { e.photoURL = p }
+        } else {
+            let entry = SymptomEntry(
+                date: date,
+                mood: mood,
+                sleepHours: sleepHours,
+                nausea: nausea,
+                weightKg: weight,
+                photoURL: photoURL,
+                notes: notes
+            )
+            modelContext.insert(entry)
+        }
         try? modelContext.save()
         dismiss()
     }

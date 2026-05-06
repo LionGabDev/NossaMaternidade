@@ -23,8 +23,8 @@ struct HomeWelcomeView: View {
             // Fundo que respira
             LinearGradient(
                 colors: [
-                    Color(hex: "#A8B89F"),
-                    Color(hex: "#8FA088")
+                    Color(hex: "#7A9E7E"),
+                    Color(hex: "#5A7E5E")
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -36,7 +36,7 @@ struct HomeWelcomeView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color(hex: "#D9876E").opacity(0.15),
+                            Color(hex: "#E8A598").opacity(0.15),
                             Color.clear
                         ],
                         center: .center,
@@ -74,8 +74,11 @@ struct HomeWelcomeView: View {
                 }
 
                 Spacer()
+
+                OnboardingProgressDots(total: 5, current: 4)
+                    .padding(.bottom, 32)
             }
-            .padding(.vertical, 120)
+            .padding(.vertical, 80)
         }
         .onAppear {
             setupLogoChars()

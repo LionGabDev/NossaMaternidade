@@ -35,91 +35,84 @@ struct PersonalLetterView: View {
             )
             .ignoresSafeArea()
 
-            // Textura sutil de papel
-            VStack {
-                Spacer()
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                // Vinheta quente
-                RadialGradient(
-                    colors: [
-                        Color(hex: "#D9876E").opacity(0.05),
-                        Color.clear
-                    ],
-                    center: .center,
-                    startRadius: 100,
-                    endRadius: 350
-                )
+            // Vinheta quente
+            RadialGradient(
+                colors: [
+                    Color(hex: "#E8A598").opacity(0.05),
+                    Color.clear
+                ],
+                center: .center,
+                startRadius: 100,
+                endRadius: 350
             )
+            .ignoresSafeArea()
 
-            // Conteúdo da carta
-            VStack(alignment: .leading, spacing: 0) {
-                Spacer().frame(height: 100)
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Spacer().frame(height: 80)
 
-                // Saudação
-                Text("para você,")
-                    .font(.system(size: 16, weight: .light, design: .serif))
-                    .foregroundStyle(Color(hex: "#D9876E").opacity(0.7))
-                    .padding(.bottom, 24)
-                    .opacity(letterOpacity)
+                        Text("para você,")
+                            .font(.system(size: 16, weight: .light, design: .serif))
+                            .foregroundStyle(Color(hex: "#E8A598").opacity(0.7))
+                            .padding(.bottom, 24)
+                            .opacity(letterOpacity)
 
-                // Linhas da carta
-                VStack(alignment: .leading, spacing: 14) {
-                    ForEach(0..<displayedLines.count, id: \.self) { index in
-                        Text(displayedLines[index])
-                            .font(.system(size: 18, weight: .light, design: .serif))
-                            .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.88))
-                            .lineSpacing(4)
-                            .transition(.opacity.combined(with: .offset(y: 4)))
-                    }
+                        VStack(alignment: .leading, spacing: 14) {
+                            ForEach(0..<displayedLines.count, id: \.self) { index in
+                                Text(displayedLines[index])
+                                    .font(.system(size: 18, weight: .light, design: .serif))
+                                    .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.88))
+                                    .lineSpacing(4)
+                                    .transition(.opacity.combined(with: .offset(y: 4)))
+                            }
 
-                    // Cursor piscando na linha atual
-                    if currentLineIndex < letterContent.lines.count {
-                        HStack(spacing: 0) {
-                            Text(letterContent.lines[currentLineIndex].prefix(currentCharIndex))
-                                .font(.system(size: 18, weight: .light, design: .serif))
-                                .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.88))
+                            if currentLineIndex < letterContent.lines.count {
+                                HStack(spacing: 0) {
+                                    Text(letterContent.lines[currentLineIndex].prefix(currentCharIndex))
+                                        .font(.system(size: 18, weight: .light, design: .serif))
+                                        .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.88))
 
-                            CursorView()
-                                .padding(.leading, 2)
+                                    CursorView()
+                                        .padding(.leading, 2)
+                                }
+                            }
                         }
+
+                        if showSignature {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("com carinho,")
+                                    .font(.system(size: 14, weight: .light, design: .serif))
+                                    .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.5))
+
+                                Text("MamaVida")
+                                    .font(.system(size: 18, weight: .light, design: .serif).italic())
+                                    .foregroundStyle(Color(hex: "#E8A598").opacity(0.8))
+                            }
+                            .padding(.top, 32)
+                            .transition(.opacity.combined(with: .offset(y: 8)))
+                        }
+
+                        Spacer().frame(height: 40)
                     }
+                    .padding(.horizontal, 36)
+                    .opacity(letterOpacity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
-                Spacer()
-
-                // Assinatura
-                if showSignature {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("com carinho,")
-                            .font(.system(size: 14, weight: .light, design: .serif))
-                            .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.5))
-
-                        Text("MamaVida")
-                            .font(.system(size: 18, weight: .light, design: .serif).italic())
-                            .foregroundStyle(Color(hex: "#D9876E").opacity(0.8))
-                    }
-                    .padding(.bottom, 8)
-                    .transition(.opacity.combined(with: .offset(y: 8)))
-                }
-
-                // Hint para continuar
                 if showContinueHint {
-                    HStack {
-                        Spacer()
-                        Text("toque para seguir")
-                            .font(.system(size: 13, weight: .thin, design: .rounded))
-                            .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.3))
-                        Spacer()
-                    }
-                    .padding(.bottom, 40)
-                    .transition(.opacity)
+                    Text("toque para seguir")
+                        .font(.system(size: 13, weight: .thin, design: .rounded))
+                        .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.3))
+                        .padding(.bottom, 16)
+                        .transition(.opacity)
                 }
+
+                OnboardingProgressDots(total: 5, current: 3)
+                    .padding(.bottom, 32)
             }
-            .padding(.horizontal, 36)
-            .opacity(letterOpacity)
         }
+        .contentShape(Rectangle())
         .onAppear {
             withAnimation(.easeInOut(duration: 1.2)) {
                 letterOpacity = 1.0
@@ -146,10 +139,9 @@ struct PersonalLetterView: View {
         let line = letterContent.lines[currentLineIndex]
 
         if currentCharIndex < line.count {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.045) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
                 currentCharIndex += 1
 
-                // Háptica sutil a cada poucos caracteres
                 if currentCharIndex % 4 == 0 {
                     UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.15)
                 }
@@ -157,7 +149,6 @@ struct PersonalLetterView: View {
                 startTyping()
             }
         } else {
-            // Linha completa
             displayedLines.append(line)
             currentLineIndex += 1
             currentCharIndex = 0
@@ -190,7 +181,7 @@ struct CursorView: View {
 
     var body: some View {
         Rectangle()
-            .fill(Color(hex: "#D9876E").opacity(0.6))
+            .fill(Color(hex: "#E8A598").opacity(0.6))
             .frame(width: 2, height: 18)
             .opacity(isVisible ? 1 : 0)
             .onAppear {

@@ -23,7 +23,19 @@ struct ContentView: View {
         }
         .onAppear {
             DataSeeder.seedIfNeeded(context: modelContext)
+            configureTabBar()
         }
+    }
+
+    private func configureTabBar() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .white
+        let inactive = UIColor(AppColor.inactiveTab)
+        appearance.stackedLayoutAppearance.normal.iconColor = inactive
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: inactive]
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
     }
 }
 

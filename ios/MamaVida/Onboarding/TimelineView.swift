@@ -47,13 +47,13 @@ struct TimelineView: View {
                     ZStack {
                         // Linha vertical base
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(Color(hex: "#D9876E").opacity(0.2))
+                            .fill(Color(hex: "#E8A598").opacity(0.2))
                             .frame(width: 4)
 
                         // Linha preenchida
                         VStack(spacing: 0) {
                             RoundedRectangle(cornerRadius: 2)
-                                .fill(Color(hex: "#D9876E"))
+                                .fill(Color(hex: "#E8A598"))
                                 .frame(width: 4, height: max(0, dragProgress * totalHeight))
                             Spacer()
                         }
@@ -69,7 +69,7 @@ struct TimelineView: View {
                                     // Círculo na linha
                                     ZStack {
                                         Circle()
-                                            .fill(isFilled ? Color(hex: "#D9876E") : Color(hex: "#D9876E").opacity(0.2))
+                                            .fill(isFilled ? Color(hex: "#E8A598") : Color(hex: "#E8A598").opacity(0.2))
                                             .frame(width: isCurrent ? 28 : 20, height: isCurrent ? 28 : 20)
                                             .animation(.spring(response: 0.3), value: isCurrent)
 
@@ -84,7 +84,7 @@ struct TimelineView: View {
                                     HStack(spacing: 10) {
                                         Image(systemName: month.icon)
                                             .font(.system(size: 16))
-                                            .foregroundStyle(isFilled ? Color(hex: "#D9876E") : Color(hex: "#1A1A1A").opacity(0.3))
+                                            .foregroundStyle(isFilled ? Color(hex: "#E8A598") : Color(hex: "#1A1A1A").opacity(0.3))
                                             .frame(width: 24)
 
                                         Text(month.label)

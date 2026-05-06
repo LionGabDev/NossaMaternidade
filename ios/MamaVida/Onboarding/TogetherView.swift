@@ -20,7 +20,7 @@ struct TogetherView: View {
             // Fundo gradiente sálvia → areia
             LinearGradient(
                 colors: [
-                    Color(hex: "#A8B89F"),
+                    Color(hex: "#7A9E7E"),
                     Color(hex: "#F4EDE4")
                 ],
                 startPoint: .topLeading,
@@ -36,11 +36,11 @@ struct TogetherView: View {
                     HandsShape()
                         .trim(from: 0, to: strokeProgress)
                         .stroke(
-                            Color(hex: "#D9876E"),
+                            Color(hex: "#E8A598"),
                             style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
                         )
                         .frame(width: 200, height: 200)
-                        .shadow(color: Color(hex: "#D9876E").opacity(0.3), radius: 10, x: 0, y: 4)
+                        .shadow(color: Color(hex: "#E8A598").opacity(0.3), radius: 10, x: 0, y: 4)
                 }
 
                 Text("estamos juntas")

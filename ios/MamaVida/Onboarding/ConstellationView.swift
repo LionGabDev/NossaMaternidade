@@ -45,7 +45,7 @@ struct ConstellationView: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                Color(hex: "#D9876E").opacity(0.3),
+                                Color(hex: "#E8A598").opacity(0.3),
                                 Color.clear
                             ],
                             center: .center,
@@ -63,9 +63,9 @@ struct ConstellationView: View {
 
                 // Estrela central
                 Circle()
-                    .fill(Color(hex: "#D9876E"))
+                    .fill(Color(hex: "#E8A598"))
                     .frame(width: 14, height: 14)
-                    .shadow(color: Color(hex: "#D9876E").opacity(0.6), radius: 12, x: 0, y: 0)
+                    .shadow(color: Color(hex: "#E8A598").opacity(0.6), radius: 12, x: 0, y: 0)
                     .scaleEffect(userStarScale)
                     .opacity(userStarOpacity)
             }
@@ -89,26 +89,39 @@ struct ConstellationView: View {
                 }
 
                 if canAdvance {
-                    Text("toque para continuar")
-                        .font(.system(size: 13, weight: .thin, design: .rounded))
-                        .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.35))
-                        .padding(.top, 40)
-                        .transition(.opacity)
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: 0.5)
+                        withAnimation(.easeInOut(duration: 0.8)) {
+                            didComplete = true
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.up")
+                                .font(.system(size: 12, weight: .light))
+                            Text("suba para continuar")
+                                .font(.system(size: 14, weight: .regular, design: .rounded))
+                        }
+                        .foregroundStyle(Color(hex: "#F4EDE4").opacity(0.85))
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 10)
+                        .background(
+                            Capsule()
+                                .stroke(Color(hex: "#F4EDE4").opacity(0.3), lineWidth: 0.8)
+                        )
+                    }
+                    .padding(.top, 28)
+                    .transition(.opacity.combined(with: .offset(y: 6)))
                 }
 
-                Spacer().frame(height: 100)
+                Spacer().frame(height: 60)
+
+                OnboardingProgressDots(total: 5, current: 2)
+                    .padding(.bottom, 32)
             }
         }
         .onAppear {
             generateStars()
             animateSequence()
-        }
-        .onTapGesture {
-            if canAdvance {
-                withAnimation(.easeInOut(duration: 0.8)) {
-                    didComplete = true
-                }
-            }
         }
     }
 
@@ -197,7 +210,7 @@ struct StarView: View {
 
     var body: some View {
         Circle()
-            .fill(isUserStar ? Color(hex: "#D9876E") : Color(hex: "#F4EDE4"))
+            .fill(isUserStar ? Color(hex: "#E8A598") : Color(hex: "#F4EDE4"))
             .frame(width: star.size, height: star.size)
             .opacity(star.isVisible ? star.opacity * pulseOpacity : 0)
             .scaleEffect(pulseScale)

@@ -23,8 +23,8 @@ struct HeartTouchView: View {
             // Fundo gradiente verde sálvia
             LinearGradient(
                 colors: [
-                    Color(hex: "#A8B89F"),
-                    Color(hex: "#8FA088")
+                    Color(hex: "#7A9E7E"),
+                    Color(hex: "#5A7E5E")
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -38,7 +38,7 @@ struct HeartTouchView: View {
                 ZStack {
                     // Glow terracota
                     HeartShape()
-                        .fill(Color(hex: "#D9876E").opacity(glowOpacity))
+                        .fill(Color(hex: "#E8A598").opacity(glowOpacity))
                         .scaleEffect(isPressing ? 1.4 : heartScale)
                         .blur(radius: isPressing ? 30 : 0)
 
@@ -46,7 +46,7 @@ struct HeartTouchView: View {
                         .fill(Color.white.opacity(0.95))
                         .scaleEffect(isPressing ? 1.4 : heartScale)
                         .shadow(
-                            color: Color(hex: "#D9876E").opacity(isPressing ? 0.6 : 0.2),
+                            color: Color(hex: "#E8A598").opacity(isPressing ? 0.6 : 0.2),
                             radius: isPressing ? 40 : 20,
                             x: 0,
                             y: isPressing ? 10 : 5

@@ -33,7 +33,7 @@ struct BreathingWelcomeView: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            Color(hex: "#A8B89F").opacity(0.15),
+                            Color(hex: "#7A9E7E").opacity(0.15),
                             Color.clear
                         ],
                         center: .center,
@@ -47,12 +47,12 @@ struct BreathingWelcomeView: View {
             // Círculo principal de respiração
             ZStack {
                 Circle()
-                    .fill(Color(hex: "#A8B89F").opacity(0.08))
+                    .fill(Color(hex: "#7A9E7E").opacity(0.08))
                     .frame(width: 280, height: 280)
                     .scaleEffect(breathScale)
 
                 Circle()
-                    .stroke(Color(hex: "#A8B89F").opacity(0.25), lineWidth: 1)
+                    .stroke(Color(hex: "#7A9E7E").opacity(0.25), lineWidth: 1)
                     .frame(width: 280, height: 280)
                     .scaleEffect(breathScale)
 
@@ -61,8 +61,8 @@ struct BreathingWelcomeView: View {
                     .fill(
                         RadialGradient(
                             colors: [
-                                Color(hex: "#D9876E").opacity(0.2),
-                                Color(hex: "#A8B89F").opacity(0.1),
+                                Color(hex: "#E8A598").opacity(0.2),
+                                Color(hex: "#7A9E7E").opacity(0.1),
                                 Color.clear
                             ],
                             center: .center,
@@ -78,7 +78,7 @@ struct BreathingWelcomeView: View {
             // Ripple ao tocar
             if hasTouched {
                 Circle()
-                    .stroke(Color(hex: "#D9876E").opacity(0.4 - Double(touchRipple) * 0.4), lineWidth: 2)
+                    .stroke(Color(hex: "#E8A598").opacity(0.4 - Double(touchRipple) * 0.4), lineWidth: 2)
                     .frame(width: 100 + touchRipple * 200, height: 100 + touchRipple * 200)
                     .opacity(1 - Double(touchRipple))
             }

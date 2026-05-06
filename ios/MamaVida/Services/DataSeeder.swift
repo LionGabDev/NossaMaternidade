@@ -11,7 +11,6 @@ enum DataSeeder {
         let descriptor = FetchDescriptor<UserProfile>()
         guard let profiles = try? context.fetch(descriptor), profiles.isEmpty else { return }
 
-        // Create demo user at 24 weeks
         let calendar = Calendar.current
         let lmpDate = calendar.date(byAdding: .day, value: -(24 * 7 - 7), to: Date()) ?? Date()
         let dueDate = PregnancyCalculator.dueDate(from: lmpDate)
@@ -20,6 +19,8 @@ enum DataSeeder {
             lmpDate: lmpDate,
             dueDate: dueDate,
             babyName: "Maria",
+            userName: "Maria Silva",
+            birthDate: calendar.date(from: DateComponents(year: 1990, month: 3, day: 15)),
             hasAcceptedTerms: true
         )
         context.insert(profile)
@@ -39,21 +40,28 @@ enum DataSeeder {
         }
 
         // Seed appointments
-        let appointmentTypes = ["Consulta pré-natal", "Ultrassom morfológico", "Exame de sangue", "Vacina", "Consulta com cardiologista"]
-        let locations = ["Hospital São Lucas", "Clínica Maternal", "Laboratório Dasa", "UBS Centro", "Consultório Dra. Silva"]
-
-        for i in 0..<5 {
+        let seeds: [(AppointmentType, String, String)] = [
+            (.consulta, "Hospital São Lucas", "Dra. Ana Paula"),
+            (.ultrassom, "Clínica Maternal", "Dr. Pedro Costa"),
+            (.exame, "Laboratório Dasa", ""),
+            (.vacina, "UBS Centro", ""),
+            (.consulta, "Consultório Dra. Silva", "Dra. Maria Silva")
+        ]
+        for i in 0..<seeds.count {
             guard let date = calendar.date(byAdding: .day, value: i * 7 - 14, to: Date()) else { continue }
             var components = calendar.dateComponents([.year, .month, .day], from: date)
             components.hour = 9 + i
-            components.minute = 0
+            components.minute = (i % 2 == 0) ? 0 : 30
             let appointmentDate = calendar.date(from: components) ?? date
 
+            let (type, location, doctor) = seeds[i]
             let appointment = Appointment(
-                type: appointmentTypes[i % appointmentTypes.count],
+                type: type.rawValue,
                 dateTime: appointmentDate,
-                location: locations[i % locations.count],
-                notes: ""
+                location: location,
+                doctor: doctor,
+                notes: "",
+                reminderEnabled: true
             )
             context.insert(appointment)
         }

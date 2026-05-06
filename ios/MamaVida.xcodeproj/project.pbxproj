@@ -405,6 +405,8 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "O MamaVida precisa acessar a câmera para tirar fotos da sua barriga.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "O MamaVida precisa acessar o microfone para você gravar uma mensagem de carinho para o seu bebê.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "O MamaVida precisa acessar suas fotos para salvar imagens da sua barriga.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "O MamaVida adiciona suas consultas pré-natais ao calendário do seu dispositivo.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "O MamaVida adiciona suas consultas pré-natais ao calendário do seu dispositivo.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -442,6 +444,8 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "O MamaVida precisa acessar a câmera para tirar fotos da sua barriga.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "O MamaVida precisa acessar o microfone para você gravar uma mensagem de carinho para o seu bebê.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "O MamaVida precisa acessar suas fotos para salvar imagens da sua barriga.";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "O MamaVida adiciona suas consultas pré-natais ao calendário do seu dispositivo.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "O MamaVida adiciona suas consultas pré-natais ao calendário do seu dispositivo.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
