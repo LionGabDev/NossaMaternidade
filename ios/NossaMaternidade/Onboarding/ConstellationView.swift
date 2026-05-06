@@ -274,9 +274,10 @@ struct ConnectionLinesView: View {
                         path.move(to: starA.position)
                         path.addLine(to: starB.position)
 
+                        let lineOpacity: Double = 0.3 * (1.0 - Double(distance) / 120.0)
                         context.stroke(
                             path,
-                            with: .color(Color(hex: "#F4EDE4").opacity(0.3 * (1 - distance / 120))),
+                            with: .color(Color(hex: "#F4EDE4").opacity(lineOpacity)),
                             lineWidth: 0.5
                         )
                     }
