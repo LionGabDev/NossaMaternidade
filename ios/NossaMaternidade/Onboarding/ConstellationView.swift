@@ -17,6 +17,7 @@ struct ConstellationView: View {
     @State private var userStarOpacity: Double = 0
     @State private var connectionLines: Bool = false
     @State private var canAdvance = false
+    @State private var dragOffset: CGFloat = 0
 
     private let starCount = 45
 
@@ -90,10 +91,7 @@ struct ConstellationView: View {
 
                 if canAdvance {
                     Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: 0.5)
-                        withAnimation(.easeInOut(duration: 0.8)) {
-                            didComplete = true
-                        }
+                        advance()
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "chevron.up")
@@ -106,7 +104,7 @@ struct ConstellationView: View {
                         .padding(.vertical, 10)
                         .background(
                             Capsule()
-                                .stroke(Color(hex: "#F4EDE4").opacity(0.3), lineWidth: 0.8)
+                                .stroke(Color(hex: "#F4EDE4").opacity(0.3 + min(0.5, -dragOffset / 200)), lineWidth: 0.8)
                         )
                     }
                     .padding(.top, 28)
@@ -119,9 +117,38 @@ struct ConstellationView: View {
                     .padding(.bottom, 32)
             }
         }
+        .offset(y: dragOffset)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 10)
+                .onChanged { value in
+                    guard canAdvance else { return }
+                    // Apenas arraste para cima
+                    let translation = min(0, value.translation.height)
+                    dragOffset = translation * 0.5
+                }
+                .onEnded { value in
+                    guard canAdvance else { return }
+                    if value.translation.height < -80 {
+                        advance()
+                    } else {
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                            dragOffset = 0
+                        }
+                    }
+                }
+        )
         .onAppear {
             generateStars()
             animateSequence()
+        }
+    }
+
+    private func advance() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred(intensity: 0.5)
+        withAnimation(.easeInOut(duration: 0.8)) {
+            dragOffset = -UIScreen.main.bounds.height
+            didComplete = true
         }
     }
 
