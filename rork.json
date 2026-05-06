@@ -2,7 +2,7 @@
   "$schema": "https://rork.com/schema/rork.json",
   "apps": [
     {
-      "name": "MamaVida",
+      "name": "Nossa Maternidade",
       "path": "ios",
       "framework": "swift"
     }
