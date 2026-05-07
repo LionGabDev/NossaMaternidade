@@ -22,7 +22,9 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            #if DEBUG
             DataSeeder.seedIfNeeded(context: modelContext)
+            #endif
             configureTabBar()
         }
     }
